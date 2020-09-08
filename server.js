@@ -21,10 +21,6 @@ app.use(express.json());
 // Quotes routes
 app.use("/api/v1/quotes", quotes);
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World</h1>");
-});
-
 app.listen(PORT, () =>
   console.log(`Server started in ${process.env.NODE_ENV} mode on port ${PORT}`)
 );
