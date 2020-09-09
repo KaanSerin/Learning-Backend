@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const colors = require("colors");
 
 const quotes = require("./routes/quotes");
+const authors = require("./routes/authors");
 const connectDB = require("./config/db");
 
 // Loading environment variables
@@ -18,8 +19,9 @@ connectDB();
 // Body Parser
 app.use(express.json());
 
-// Quotes routes
+// Routes
 app.use("/api/v1/quotes", quotes);
+app.use("/api/v1/authors", authors);
 
 app.listen(PORT, () =>
   console.log(`Server started in ${process.env.NODE_ENV} mode on port ${PORT}`)

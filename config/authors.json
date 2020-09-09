@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Mustafa Kemal Atatürk",
+    "about": "Found of the modern day Turkey",
+    "alive": false
+  },
+  {
+    "name": "Paulo Coelho",
+    "about": "Paulo Coelho de Souza is a Brazilian lyricist and novelist, best known for his novel The Alchemist.",
+    "alive": true
+  },
+  {
+    "name": "Dalai Lama",
+    "about": "Dalai Lamas are important monks of the Gelug school, the newest school of Tibetan Buddhism, which was formally headed by the Ganden Tripas.",
+    "alive": true
+  },
+  {
+    "name": "John Lennon",
+    "about": "John Winston Ono Lennon MBE was an English singer, songwriter, and peace activist who gained worldwide fame as the founder, co-lead vocalist, and rhythm guitarist of the Beatles.",
+    "alive": false
+  }
+]
