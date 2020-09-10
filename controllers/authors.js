@@ -1,4 +1,4 @@
-const AuthorModel = require("../models/author");
+const AuthorModel = require("../models/Author");
 
 /**
  * @desc    Get all authors
@@ -17,7 +17,7 @@ exports.getAuthors = async (req, res, next) => {
       .status(200)
       .json({ success: true, count: authors.length, data: authors });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(400).json({ success: false, error });
   }
 };
 
@@ -39,7 +39,7 @@ exports.getAuthor = async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: author });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(400).json({ success: false, error });
   }
 };
 
@@ -61,7 +61,33 @@ exports.deleteAuthor = async (req, res, next) => {
 
     return res.status(401).json({ success: true, data: author });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(400).json({ success: false, error });
+  }
+};
+
+/**
+ * @desc    Update an author by id
+ * @route   PUT /api/v1/authors/:id
+ * @access  Private
+ */
+exports.updateAuthor = async (req, res, next) => {
+  try {
+    const author = await AuthorModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!author) {
+      return res.status(404).json({
+        success: false,
+        msg: `Author not found with id ${req.params.id}`,
+      });
+    }
+
+    return res.status(200).json({ success: true, data: author });
+  } catch (error) {
+    return res.status(400).json({ success: false, error });
   }
 };
 
@@ -75,6 +101,6 @@ exports.addAuthor = async (req, res, next) => {
     const author = await AuthorModel.create(req.body);
     return res.status(201).json({ success: true, data: author });
   } catch (error) {
-    res.status(500).json({ success: false, error });
+    res.status(400).json({ success: false, error });
   }
 };

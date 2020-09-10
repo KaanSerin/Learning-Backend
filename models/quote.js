@@ -8,9 +8,11 @@ const QuoteSchema = new mongoose.Schema({
     unique: true,
   },
   author: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Author",
     required: true,
   },
+
   language: {
     type: String,
     required: false,
@@ -18,8 +20,9 @@ const QuoteSchema = new mongoose.Schema({
   authorSlug: String,
 });
 
-QuoteSchema.pre("save", function (next) {
-  this.authorSlug = slugify(this.author, {
+QuoteSchema.pre("save", async function (next) {
+  const author = await this.model("Author").findById(this.author.toString());
+  this.authorSlug = slugify(author.name, {
     lower: true,
     strict: true,
     replacement: "_",

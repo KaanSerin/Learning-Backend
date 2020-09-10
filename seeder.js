@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const QuoteModel = require("./models/quote");
+const AuthorModel = require("./models/author");
 const colors = require("colors");
 
 mongoose.connect(
@@ -15,13 +16,22 @@ mongoose.connect(
   }
 );
 
-const deleteAllQuotes = async () => {
+const deleteAll = async () => {
   await QuoteModel.deleteMany();
+  await AuthorModel.deleteMany();
   console.log("Deleted Quotes...".underline.bold.red);
   process.exit();
 };
 
-const addAllQuotes = async () => {
+const addAll = async () => {
+  await AuthorModel.create(
+    JSON.parse(
+      fs.readFileSync(path.join(__dirname, "config", "authors.json"), {
+        encoding: "utf-8",
+      })
+    )
+  );
+
   await QuoteModel.create(
     JSON.parse(
       fs.readFileSync(path.join(__dirname, "config", "quotes.json"), {
@@ -34,9 +44,9 @@ const addAllQuotes = async () => {
 };
 
 if (process.argv[2] === "-D") {
-  deleteAllQuotes();
+  deleteAll();
 } else if (process.argv[2] === "-i") {
-  addAllQuotes();
+  addAll();
 } else {
   console.log(
     "No arguments. -i to load all data. -D to delete all database documents"

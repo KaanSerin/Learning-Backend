@@ -1,22 +1,32 @@
 [
   {
+    "_id": "5f5a84f184c7a20869217abd",
     "name": "Mustafa Kemal Atatürk",
-    "about": "Found of the modern day Turkey",
+    "about": "Founder of the modern day Turkey",
     "alive": false
   },
   {
+    "_id": "5f5a84f184c7a20869217abe",
     "name": "Paulo Coelho",
     "about": "Paulo Coelho de Souza is a Brazilian lyricist and novelist, best known for his novel The Alchemist.",
     "alive": true
   },
   {
-    "name": "Dalai Lama",
+    "_id": "5f5a87c8c5276b090581d1c6",
+    "name": "Dalai Lama 13th",
     "about": "Dalai Lamas are important monks of the Gelug school, the newest school of Tibetan Buddhism, which was formally headed by the Ganden Tripas.",
     "alive": true
   },
   {
+    "_id": "5f5a84f184c7a20869217ac0",
     "name": "John Lennon",
     "about": "John Winston Ono Lennon MBE was an English singer, songwriter, and peace activist who gained worldwide fame as the founder, co-lead vocalist, and rhythm guitarist of the Beatles.",
+    "alive": false
+  },
+  {
+    "_id": "5f5a84f184c7a20869217ac1",
+    "name": "Oscar Wilde",
+    "about": "Oscar Fingal O'Flahertie Wills Wilde was an Irish playwright, poet, and author of numerous short stories, and one novel.",
     "alive": false
   }
 ]
