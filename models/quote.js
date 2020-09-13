@@ -4,13 +4,13 @@ const slugify = require("slugify");
 const QuoteSchema = new mongoose.Schema({
   text: {
     type: String,
-    required: true,
     unique: true,
+    required: [true, "Please enter the quote."],
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Author",
-    required: true,
+    required: [true, "Please enter the id of the author of the quote"],
   },
 
   language: {
