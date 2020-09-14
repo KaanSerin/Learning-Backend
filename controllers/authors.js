@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const Author = require("../models/Author");
 const AuthorModel = require("../models/Author");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -8,15 +9,7 @@ const ErrorResponse = require("../utils/errorResponse");
  * @access   Public
  */
 exports.getAuthors = asyncHandler(async (req, res, next) => {
-  const authors = await AuthorModel.find();
-
-  if (authors.length === 0) {
-    return next(new ErrorResponse("No authors found.", 400));
-  }
-
-  return res
-    .status(200)
-    .json({ success: true, count: authors.length, data: authors });
+  return res.status(200).json(res.advancedResults);
 });
 
 /**

@@ -30,6 +30,6 @@ QuoteSchema.pre("save", async function (next) {
   return next();
 });
 
-const QuoteModel = mongoose.model("Quote", QuoteSchema);
+const Quote = mongoose.model("Quote", QuoteSchema);
 
-module.exports = QuoteModel;
+module.exports = Quote;

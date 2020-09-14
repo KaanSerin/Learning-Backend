@@ -2,7 +2,7 @@ const ErrorResponse = require("../utils/errorResponse");
 
 module.exports = errorHandler = (err, req, res, next) => {
   // Log for the user to see
-  //   console.log(err);
+  console.log(err);
 
   let error = { ...err };
 

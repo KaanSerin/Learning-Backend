@@ -8,16 +8,7 @@ const ErrorResponse = require("../utils/errorResponse");
  * @access  Public
  */
 exports.getQuotes = asyncHandler(async (req, res, next) => {
-  const quotes = await QuoteModel.find().populate("author", "name about");
-  if (!quotes) {
-    return next(new ErrorResponse(`No quotes found.`, 404));
-  }
-
-  return res.status(200).json({
-    success: true,
-    count: quotes.length,
-    data: quotes,
-  });
+  return res.status(200).json(res.advancedResults);
 });
 
 /**
