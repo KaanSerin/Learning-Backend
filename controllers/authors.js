@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const Author = require("../models/Author");
 const AuthorModel = require("../models/Author");
 const ErrorResponse = require("../utils/errorResponse");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * @desc    Get all authors
@@ -73,4 +75,32 @@ exports.updateAuthor = asyncHandler(async (req, res, next) => {
 exports.addAuthor = asyncHandler(async (req, res, next) => {
   const author = await AuthorModel.create(req.body);
   return res.status(201).json({ success: true, data: author });
+});
+
+/**
+ * @desc    Add an author image
+ * @route   POST /api/v1/authors/:id/image
+ * @access  Private
+ */
+exports.uploadAuthorImage = asyncHandler(async (req, res, next) => {
+  let file = Object.values(req.files)[0];
+
+  if (file.size > process.env.MAX_FILE_SIZE) {
+    return next(new ErrorResponse("Image file must be smalled then 4MB!", 400));
+  }
+  if (!/\.(gif|jpe?g|tiff?|png|webp|bmp)$/i.test(file.name)) {
+    return next(new ErrorResponse("Please upload an image file", 400));
+  }
+
+  let filePath = path.join("public/images/authors", `${req.params.id}.jpeg`);
+
+  console.log();
+
+  if (fs.existsSync(filePath) && req.headers.override !== "true") {
+    return next(new ErrorResponse("Author image already exists", 400));
+  }
+
+  await file.mv(filePath);
+
+  res.status(200).json({ sucess: true, msg: "Author image set!" });
 });

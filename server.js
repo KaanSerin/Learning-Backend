@@ -2,11 +2,12 @@ const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const colors = require("colors");
-
+const path = require("path");
 const quotes = require("./routes/quotes");
 const authors = require("./routes/authors");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
+const fileUpload = require("express-fileupload");
 
 // Loading environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -17,8 +18,17 @@ const app = express();
 
 connectDB();
 
+// Serving static files
+app.use(express.static(path.join(__dirname, "public")));
+
 // Body Parser
 app.use(express.json());
+
+app.use(
+  fileUpload({
+    limits: { fileSize: process.env.MAX_FILE_SIZE },
+  })
+);
 
 // Routes
 app.use("/api/v1/quotes", quotes);
