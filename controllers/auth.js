@@ -11,7 +11,9 @@ const bcrypt = require("bcryptjs");
 exports.register = expressAsyncHandler(async (req, res, next) => {
   const user = await User.create(req.body);
 
-  res.status(200).json({ success: true, data: user });
+  const token = user.getSignedJwtToken();
+
+  res.status(200).json({ success: true, token });
 });
 
 /**
@@ -40,5 +42,19 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Invalid username and / or password", 400));
   }
 
-  res.status(200).json({ success: true, data: user });
+  const token = user.getSignedJwtToken();
+
+  res.status(200).json({ success: true, token });
+});
+
+/**
+ * @desc    Get User Information
+ * @route   GET /api/v1/auth/me
+ * @access  Private
+ */
+
+// Todo: Use the jwt from req.header , parse it to the id, authenticate the user, and return some information about said user
+//      If user not found throw unauthorized error.
+exports.login = expressAsyncHandler(async (req, res, next) => {
+  res.status(200).json({ success: true, token });
 });
