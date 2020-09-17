@@ -5,6 +5,7 @@ const colors = require("colors");
 const path = require("path");
 const quotes = require("./routes/quotes");
 const authors = require("./routes/authors");
+const auth = require("./routes/auth");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const fileUpload = require("express-fileupload");
@@ -33,6 +34,7 @@ app.use(
 // Routes
 app.use("/api/v1/quotes", quotes);
 app.use("/api/v1/authors", authors);
+app.use("/api/v1/auth", auth);
 
 // Middleware. This has to be the last .use() method for the app
 app.use(errorHandler);

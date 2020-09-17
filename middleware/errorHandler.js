@@ -17,6 +17,10 @@ module.exports = errorHandler = (err, req, res, next) => {
     error = new ErrorResponse(message, 400);
   }
 
+  if (err.code === 11000) {
+    error = new ErrorResponse("Document already exists", 400);
+  }
+
   res
     .status(error.statusCode || 500)
     .json({ success: false, msg: error.message || err });
