@@ -9,6 +9,8 @@ const auth = require("./routes/auth");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const fileUpload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
+const moment = require("moment");
 
 // Loading environment variables
 dotenv.config({ path: "./config/config.env" });
@@ -24,6 +26,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Body Parser
 app.use(express.json());
+
+app.use(
+  cookieParser(process.env.COOKIES_SECRET, {
+    signed: true,
+    httpOnly: true,
+    expires: moment().add(process.env.COOKIES_EXPIRE, "days"),
+  })
+);
 
 app.use(
   fileUpload({

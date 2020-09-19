@@ -2,6 +2,8 @@ const expressAsyncHandler = require("express-async-handler");
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 /**
  * @desc    Register a user
@@ -12,6 +14,8 @@ exports.register = expressAsyncHandler(async (req, res, next) => {
   const user = await User.create(req.body);
 
   const token = user.getSignedJwtToken();
+
+  res.cookie("AUTH_TOKEN", token);
 
   res.status(200).json({ success: true, token });
 });
@@ -44,6 +48,8 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 
   const token = user.getSignedJwtToken();
 
+  res.cookie("AUTH_TOKEN", token);
+
   res.status(200).json({ success: true, token });
 });
 
@@ -55,6 +61,12 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 
 // Todo: Use the jwt from req.header , parse it to the id, authenticate the user, and return some information about said user
 //      If user not found throw unauthorized error.
-exports.login = expressAsyncHandler(async (req, res, next) => {
-  res.status(200).json({ success: true, token });
+
+/**
+ * @desc    Get information about the user
+ * @route   GET /api/v1/auth/me
+ * @access  Private
+ */
+exports.me = expressAsyncHandler(async (req, res, next) => {
+  res.status(200).json({ success: true, user: req.user });
 });
