@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -27,6 +28,8 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
   password: {
     type: String,
     required: [true, "Please enter a password."],
@@ -35,6 +38,23 @@ const UserSchema = new mongoose.Schema({
 });
 
 UserSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+
+  console.log("Hashed password");
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(this.password, salt);
+  this.password = hash;
+});
+
+UserSchema.pre("update", async function () {
+  console.log("ello");
+
+  if (!this.isModified("password")) {
+    return;
+  }
+
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(this.password, salt);
   this.password = hash;
@@ -44,6 +64,30 @@ UserSchema.methods.getSignedJwtToken = function () {
   const token = jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES,
   });
+
+  return token;
+};
+
+// UserSchema.methods.updatePassword = async function (password) {
+//   const salt = await bcrypt.genSalt(10);
+//   const hash = await bcrypt.hash(password, salt);
+//   this.password = hash;
+//   return hash;
+// };
+
+// Get Reset Password Token and save it decrypted using node crypto
+UserSchema.methods.getResetPasswordToken = function () {
+  const token = crypto.randomBytes(20).toString("hex");
+
+  const encryptedToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  console.log(`token: ${token} | encrypted token: ${encryptedToken}`);
+
+  this.resetPasswordToken = encryptedToken;
+  this.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
 
   return token;
 };
