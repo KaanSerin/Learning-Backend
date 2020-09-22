@@ -21,6 +21,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.28.0",
     "mongoose": "^5.10.3",
+    "nodemailer": "^6.4.11",
     "slugify": "^1.4.5"
   },
   "devDependencies": {

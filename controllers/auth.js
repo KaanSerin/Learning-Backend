@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto");
-
+const utils = require("../utils/utils");
 /**
  * @desc    Register a user
  * @route   POST /api/v1/auth/register
@@ -71,15 +71,25 @@ exports.me = expressAsyncHandler(async (req, res, next) => {
 exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
   const { email } = req.body;
 
+  if (!email) {
+    return next(new ErrorResponse("No email provided", 400));
+  }
+
   const user = await User.findOne({ email });
 
   const token = user.getResetPasswordToken();
 
   // DECODE THE TOKEN ABOVE WITH JSON WEB TOKENS AND USE THAT
+  const jwtToken = jwt.sign({ token }, process.env.JWT_SECRET);
+
+  await utils.sendMail(
+    `Go here pls: https://www.myapi.com/api/v1/auth/resetpassword?token=${jwtToken}`,
+    email
+  );
 
   await user.save({ validateBeforeSave: false });
 
-  res.status(200).json({ success: true, token });
+  res.status(200).json({ success: true, token: jwtToken });
 });
 
 /**
@@ -87,6 +97,8 @@ exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
  * @route   POST /api/v1/auth/forgotpassword
  * @access  Private
  */
+
+// Read this article:  https://medium.com/mesan-digital/tutorial-3b-how-to-add-password-reset-to-your-node-js-authentication-api-using-sendgrid-ada54c8c0d1f
 exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
   // THE TOKEN WILL A JSONWEBTOKEN AND WILL NEED TO BE DECODED
   const { token } = req.query;
@@ -101,17 +113,17 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Please enter a new password", 400));
   }
 
-  console.log(token, password);
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET).token;
 
   const encrypedPasswordToken = crypto
     .createHash("sha256")
-    .update(token)
+    .update(decodedToken)
     .digest("hex");
 
   let user = await User.findOne({ resetPasswordToken: encrypedPasswordToken });
 
   if (!user) {
-    return next(new ErrorResponse("User unauthorized", 401));
+    return next(new ErrorResponse("Invalid Token", 401));
   }
 
   if (Date.now() > user.resetPasswordExpire) {
@@ -119,6 +131,8 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
   }
 
   user.password = password;
+  user.resetPasswordToken = null;
+  user.resetPasswordExpire = null;
 
   await user.save({ validateBeforeSave: false });
 
