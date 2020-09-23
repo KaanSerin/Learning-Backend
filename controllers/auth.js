@@ -127,12 +127,16 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
   }
 
   if (Date.now() > user.resetPasswordExpire) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
     return next(new ErrorResponse("Reset token expired", 401));
   }
 
   user.password = password;
-  user.resetPasswordToken = null;
-  user.resetPasswordExpire = null;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
 
   await user.save({ validateBeforeSave: false });
 
