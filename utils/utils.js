@@ -10,7 +10,7 @@ exports.sendMail = async (message, to) => {
   });
 
   const mailOptions = {
-    from: process.env.NODEMAILER_EMAIL,
+    from: `Quotes And Authors <${process.env.NODEMAILER_EMAIL}>`,
     to,
     subject: "Reset Password",
     text: message,

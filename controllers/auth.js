@@ -64,6 +64,35 @@ exports.me = expressAsyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @desc    Update Password
+ * @route   PUT /api/v1/auth/updatePassword
+ * @access  Private
+ */
+exports.updatePassword = expressAsyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  console.log(req.user.email);
+
+  if (!currentPassword || !newPassword) {
+    return next(
+      new ErrorResponse("Please provide a current and new password", 400)
+    );
+  }
+
+  const user = await User.findById(req.user.id).select("+password");
+
+  if (!(await bcrypt.compare(currentPassword, user.password))) {
+    return next(new ErrorResponse("Invalid password", 400));
+  }
+
+  user.password = newPassword;
+
+  await user.save({ runValidators: true });
+
+  res.status(200).json({ success: true, user });
+});
+
+/**
  * @desc    Forgot Password. Get a reset password token.
  * @route   POST /api/v1/auth/forgotpassword
  * @access  Private
@@ -79,29 +108,30 @@ exports.forgotPassword = expressAsyncHandler(async (req, res, next) => {
 
   const token = user.getResetPasswordToken();
 
-  // DECODE THE TOKEN ABOVE WITH JSON WEB TOKENS AND USE THAT
-  const jwtToken = jwt.sign({ token }, process.env.JWT_SECRET);
-
-  await utils.sendMail(
-    `Go here pls: https://www.myapi.com/api/v1/auth/resetpassword?token=${jwtToken}`,
-    email
-  );
+  try {
+    await utils.sendMail(
+      `Go here pls: https://www.myapi.com/api/v1/auth/resetpassword/${token}`,
+      email
+    );
+  } catch (error) {
+    return next(new ErrorResponse("Email could not be sent", 500));
+  }
 
   await user.save({ validateBeforeSave: false });
 
-  res.status(200).json({ success: true, token: jwtToken });
+  res.status(200).json({ success: true, token: token });
 });
 
 /**
  * @desc    Reset Password.
- * @route   POST /api/v1/auth/forgotpassword
+ * @route   POST /api/v1/auth/resetpassword
  * @access  Private
  */
 
 // Read this article:  https://medium.com/mesan-digital/tutorial-3b-how-to-add-password-reset-to-your-node-js-authentication-api-using-sendgrid-ada54c8c0d1f
 exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
-  // THE TOKEN WILL A JSONWEBTOKEN AND WILL NEED TO BE DECODED
-  const { token } = req.query;
+  // THE TOKEN WILL NEED TO BE DECODED
+  const { token } = req.params;
 
   if (!token) {
     return next(new ErrorResponse("Invalid route", 400));
@@ -113,25 +143,18 @@ exports.resetPassword = expressAsyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Please enter a new password", 400));
   }
 
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET).token;
-
   const encrypedPasswordToken = crypto
     .createHash("sha256")
-    .update(decodedToken)
+    .update(token)
     .digest("hex");
 
-  let user = await User.findOne({ resetPasswordToken: encrypedPasswordToken });
+  let user = await User.findOne({
+    resetPasswordToken: encrypedPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
 
   if (!user) {
     return next(new ErrorResponse("Invalid Token", 401));
-  }
-
-  if (Date.now() > user.resetPasswordExpire) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    return next(new ErrorResponse("Reset token expired", 401));
   }
 
   user.password = password;
