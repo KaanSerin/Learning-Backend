@@ -10,6 +10,10 @@ module.exports = errorHandler = (err, req, res, next) => {
     error = new ErrorResponse("Please enter a valid id", 400);
   }
 
+  if (err.name === "CastError") {
+    error = new ErrorResponse("Invalid input", 400);
+  }
+
   if (err.name === "ValidationError") {
     let message = Object.keys(error.errors)
       .map((key) => error.errors[key].message)

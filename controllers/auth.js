@@ -55,6 +55,20 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 });
 
 /**
+ * @desc    Logout User
+ * @route   GET /api/v1/auth/logout
+ * @access  Private
+ */
+exports.logout = expressAsyncHandler(async (req, res, next) => {
+  res.cookie("AUTH_TOKEN", "none", {
+    httpOnly: true,
+    expires: new Date(Date.now() + 10 * 1000),
+  });
+
+  res.status(200).json({ success: true, data: {} });
+});
+
+/**
  * @desc    Get information about the user
  * @route   GET /api/v1/auth/me
  * @access  Private

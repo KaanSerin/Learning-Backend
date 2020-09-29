@@ -21,7 +21,11 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
       token = authorization.split(" ")[1];
     }
   } else if (AUTH_TOKEN) {
-    token = AUTH_TOKEN;
+    if (AUTH_TOKEN === "none") {
+      return next(new ErrorResponse("User Unauthorized.", 401));
+    } else {
+      token = AUTH_TOKEN;
+    }
   }
 
   // const token = authorization.split(" ")[1];

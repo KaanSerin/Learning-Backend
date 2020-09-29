@@ -9,7 +9,13 @@ const auth = require("./routes/auth");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const fileUpload = require("express-fileupload");
+const cors = require("cors");
+const helmet = require("helmet");
+const xss = require("xss-clean");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const hpp = require("hpp");
+const rateLimit = require("express-rate-limit");
 const moment = require("moment");
 
 // Loading environment variables
@@ -20,6 +26,12 @@ const PORT = process.env.PORT || 6000;
 const app = express();
 
 connectDB();
+
+// Enabling CORS for all routes
+app.use(cors());
+
+// Using Helmet to set secure HTTP headers
+app.use(helmet());
 
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -40,6 +52,20 @@ app.use(
     limits: { fileSize: process.env.MAX_FILE_SIZE },
   })
 );
+
+// Preventing NoSQL injection attacks by sanitizing body and query params to
+app.use(mongoSanitize());
+
+// HTTP Paramater Pollution Attack prevention
+app.use(hpp());
+
+// Limiting user request amount
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 100, // 100 requests
+});
+
+app.use(limiter);
 
 // Routes
 app.use("/api/v1/quotes", quotes);
