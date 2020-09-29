@@ -11,6 +11,7 @@ const AuthorSchema = mongoose.Schema({
     required: [true, "Enter a few words about the author"],
   },
   alive: Boolean,
+  numberOfQuotes: Number,
 });
 
 module.exports = mongoose.model("Author", AuthorSchema);

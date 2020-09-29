@@ -49,8 +49,6 @@ UserSchema.pre("save", async function () {
 });
 
 UserSchema.pre("update", async function () {
-  console.log("ello");
-
   if (!this.isModified("password")) {
     return;
   }

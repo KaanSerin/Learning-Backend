@@ -30,6 +30,30 @@ QuoteSchema.pre("save", async function (next) {
   return next();
 });
 
+// When a quote is added/removed update the number of reviews for the reviews author
+QuoteSchema.statics.setNumberOfReviews = async function (authorId) {
+  console.log("ello");
+  const obj = await this.aggregate([
+    { $match: { author: authorId } },
+    // Just put _id for the grouping everytime
+    { $group: { _id: "$author", count: { $sum: 1 } } },
+  ]);
+
+  const count = obj[0].count;
+
+  await this.model("Author").findByIdAndUpdate(authorId, {
+    numberOfQuotes: count,
+  });
+};
+
+QuoteSchema.post("save", async function (next) {
+  await this.constructor.setNumberOfReviews(this.author);
+});
+
+QuoteSchema.post("remove", async function (next) {
+  await this.constructor.setNumberOfReviews(this.author);
+});
+
 const Quote = mongoose.model("Quote", QuoteSchema);
 
 module.exports = Quote;
