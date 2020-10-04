@@ -50,6 +50,7 @@ QuoteSchema.post("save", async function (next) {
   await this.constructor.setNumberOfReviews(this.author);
 });
 
+// Make this work thanks...
 QuoteSchema.post("remove", async function (next) {
   await this.constructor.setNumberOfReviews(this.author);
 });
