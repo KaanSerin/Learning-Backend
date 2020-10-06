@@ -31,7 +31,13 @@ connectDB();
 app.use(cors());
 
 // Using Helmet to set secure HTTP headers
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      scriptSrc: ["unsafe-inline"],
+    },
+  })
+);
 
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
